@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap");
+
+body {
+  font-family: "Raleway", sans-serif;
+  background: radial-gradient(1.5em 6.28571em at 1.95em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0) 55%) 0 0, radial-gradient(1.5em 6.28571em at -0.45em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0) 55%) 1.5em 5.5em, radial-gradient(2.3em 4.57143em at 2.99em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.3) 55%, rgba(255, 255, 255, 0) 55%) 0 0, radial-gradient(2.3em 4.57143em at -0.69em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.3) 55%, rgba(255, 255, 255, 0) 55%) 2.3em 4em, radial-gradient(3.5em 6.28571em at 4.55em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0) 55%) 0 0, radial-gradient(3.5em 6.28571em at -1.05em, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.25) 55%, rgba(255, 255, 255, 0) 55%) 3.5em 5.5em, radial-gradient(#d6d6d6, #929292);
+  /* background-color: mediumspringgreen; */
+  background-size: 1.5em 11em, 1.5em 11em, 2.3em 8em, 2.3em 8em, 3.5em 11em, 3.5em 11em, 100% 100%;
+  background-repeat: repeat;
+}
+
+.chat-area,
+.home,
+div.content {
+  margin-top: 3rem;
+}
+
+.chat-area {
+  width: 500px;
+  padding: 10px;
+  height: 83vh;
+  overflow-y: scroll;
+}
+
+.form {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+  bottom: 0;
+  width: 100%;
+}
+
+.form input {
+  width: 85%;
+}
+.form button {
+  width: 10%;
+}
+
+div .chat-bubble {
+  background-color: #0069d9;
+  color: white;
+  margin-bottom: 0.2rem;
+  padding: 0.8rem 24px;
+  border-radius: 10px 30px 30px 10px;
+  max-width: 270px;
+  word-wrap: break-word;
+}
+
+.chat-bubble .chat-time {
+  font-size: 0.55rem;
+  color: white;
+  text-align: right;
+}
+
+div .chat-bubble.current-user {
+  margin-left: auto;
+  border-radius: 30px 10px 10px 30px;
+  background-color: #2cac0d;
+}
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+.btn-submit {
+  background-color: #2e7d32;
+  box-shadow: none;
+  color: white;
+}
+
+/* Simple loading spinner */
+.spinner {
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  position: absolute;
+  border: 8px solid #4092eb;
+  border-radius: 50%;
+  border-top-color: #fcfcfc;
+  animation: spin 700ms linear infinite;
+  -webkit-animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .form {
+    width: 100%;
+  }
+
+  .chat-area .chat-bubble {
+    max-width: 250px;
+  }
+}
