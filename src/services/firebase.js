@@ -1,3 +1,7 @@
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+import "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyAW2g9Bi4yxQ-lwyLyAld1dyjbPMmP3Sx0",
   authDomain: "chatalone.firebaseapp.com",
@@ -10,5 +14,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-export const auth = firebase.auth();
+export const auth = firebase.auth;
 export const db = firebase.database();
+export const firestore = firebase.firestore();
