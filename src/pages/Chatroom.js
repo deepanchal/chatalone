@@ -4,7 +4,7 @@ import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 // import { firestore } from "../services/firebase";
 
-export default class Chat extends Component {
+export default class Chatroom extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,11 +24,7 @@ export default class Chat extends Component {
     this.setState({ readError: null, loadingChats: true });
     const chatArea = this.myRef.current;
     try {
-      const chatid = this.props.match.params.chatID;
-      if (!(chatid.split("_").includes(this.state.user.uid)))
-        throw { message: "You shouldn't be here 🤨" };
-
-      db.ref(`chats/${chatid}`).on("value", (snapshot) => {
+      db.ref("chatroom").on("value", (snapshot) => {
         let chats = [];
         snapshot.forEach((snap) => {
           chats.push(snap.val());
@@ -57,8 +53,14 @@ export default class Chat extends Component {
     const chatArea = this.myRef.current;
     if (this.state.content) {
       try {
-        const chatid = this.props.match.params.chatID;
-        await db.ref(`chats/${chatid}`).push({
+        // await firestore.collection("chatroom").add({
+        //   content: this.state.content,
+        //   timestamp: Date.now(),
+        //   uid: this.state.user.uid,
+        //   uname: this.state.user.displayName,
+        // });
+
+        await db.ref("chatroom").push({
           content: this.state.content,
           timestamp: Date.now(),
           uid: this.state.user.uid,
@@ -82,16 +84,15 @@ export default class Chat extends Component {
 
   render() {
     return (
-      <div className="content">
+      <div>
         <Header />
-        {this.state.readError ? (
-          <div className="alert alert-danger py-1" role="alert">
-            {this.state.readError}
-          </div>
-        ) : null}
         <div className="content d-flex justify-content-center align-items-center">
-          {/* loading indicator */}
-          {this.state.loadingChats ? <div className="spinner"></div> : ""}
+            {/* loading indicator */}
+            {this.state.loadingChats ? (
+              <div className="spinner"></div>
+              ) : (
+              ""
+            )}
           <div className="chat-area" ref={this.myRef}>
             {/* chat area */}
             {this.state.chats.map((chat) => {
@@ -113,6 +114,7 @@ export default class Chat extends Component {
           </div>
         </div>
         <form onSubmit={this.handleSubmit} className="form">
+          {this.state.error ? <p className="text-danger">{this.state.error}</p> : null}
           <input
             type="text"
             placeholder="Message..."
@@ -120,7 +122,6 @@ export default class Chat extends Component {
             name="content"
             onChange={this.handleChange}
             value={this.state.content}
-            autoFocus
           ></input>
           <button type="submit" className="btn btn-submit mt-0 mx-2">
             Send
