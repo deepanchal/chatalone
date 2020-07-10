@@ -1,4 +1,13 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# [Chatalone](https://chatalone.web.app)
+
+Chat alone with your friends!!
+
+## Credits
+
+This project was inspired by Deven Rathore's article: [Building a Real-Time Chat App with React and Firebase](https://css-tricks.com/building-a-real-time-chat-app-with-react-and-firebase/)
+
+Thanks to Deven for providing starter code and his wonderful explanation of Firebase auth & db.
+[Source Code](https://github.com/Dunebook/Firebase-auth-chat-app)
 
 ## Available Scripts
 
