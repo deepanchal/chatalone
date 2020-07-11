@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import Header from "../components/Header";
+import { Link } from "react-router-dom";
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
-// import { firestore } from "../services/firebase";
 
 export default class Chatroom extends Component {
   constructor(props) {
@@ -23,6 +22,8 @@ export default class Chatroom extends Component {
   async componentDidMount() {
     this.setState({ readError: null, loadingChats: true });
     const chatArea = this.myRef.current;
+    const chatContainer = document.querySelector("section.chat-container");
+    chatContainer.style.height = window.innerHeight + "px";
     try {
       db.ref("chatroom").on("value", (snapshot) => {
         let chats = [];
@@ -53,13 +54,6 @@ export default class Chatroom extends Component {
     const chatArea = this.myRef.current;
     if (this.state.content) {
       try {
-        // await firestore.collection("chatroom").add({
-        //   content: this.state.content,
-        //   timestamp: Date.now(),
-        //   uid: this.state.user.uid,
-        //   uname: this.state.user.displayName,
-        // });
-
         await db.ref("chatroom").push({
           content: this.state.content,
           timestamp: Date.now(),
@@ -67,6 +61,7 @@ export default class Chatroom extends Component {
           uname: this.state.user.displayName,
         });
         this.setState({ content: "" });
+        document.querySelector(".chat-input").focus();
         chatArea.scrollBy(0, chatArea.scrollHeight);
       } catch (error) {
         this.setState({ writeError: error.message });
@@ -76,57 +71,73 @@ export default class Chatroom extends Component {
 
   formatTime(timestamp) {
     const d = new Date(timestamp);
-    const time = `${d.getDate()}/${
-      d.getMonth() + 1
-    }/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
+    // const time = `${d.getDate()}/${
+    //   d.getMonth() + 1
+    // }/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
+    const time = d.toLocaleTimeString();
     return time;
   }
 
   render() {
     return (
-      <div>
-        <Header />
-        <div className="content d-flex justify-content-center align-items-center">
-            {/* loading indicator */}
-            {this.state.loadingChats ? (
-              <div className="spinner"></div>
-              ) : (
-              ""
-            )}
-          <div className="chat-area" ref={this.myRef}>
+      <div className="">
+        {this.state.readError ? (
+          <div className="alert alert-danger py-1" role="alert">
+            {this.state.readError}
+          </div>
+        ) : null}
+
+        {/* loading indicator */}
+        {this.state.loadingChats ? <div className="spinner"></div> : ""}
+        <section className="chat-container">
+          <header className="chat-header">
+            <Link to="/chat">
+              <i className="fas fa-chevron-left"></i>
+            </Link>
+            <div className="chat-header-title">Chatroom</div>
+            <div className="chat-settings">
+              <Link to="/settings">
+                <i className="fas fa-cog"></i>
+              </Link>
+            </div>
+          </header>
+
+          <main className="chatarea" ref={this.myRef}>
             {/* chat area */}
             {this.state.chats.map((chat) => {
               return (
-                <p
+                <div
                   key={chat.timestamp}
                   className={
-                    "chat-bubble " + (this.state.user.uid === chat.uid ? "current-user" : "")
+                    "msg " + (this.state.user.uid === chat.uid ? "right-msg" : "left-msg")
                   }
                 >
-                  {chat.content}
-                  <br />
-                  <span className="chat-time float-right">
-                    {this.formatTime(chat.timestamp) + " " + chat.uname}
-                  </span>
-                </p>
+                  <div className="chat-bubble">
+                    <div className="chat-info">
+                      <div className="chat-info-name noselect">{chat.uname}</div>
+                      <div className="chat-info-time noselect">{this.formatTime(chat.timestamp)}</div>
+                    </div>
+                    <div className="msg-text">{chat.content}</div>
+                  </div>
+                </div>
               );
             })}
-          </div>
-        </div>
-        <form onSubmit={this.handleSubmit} className="form">
-          {this.state.error ? <p className="text-danger">{this.state.error}</p> : null}
-          <input
-            type="text"
-            placeholder="Message..."
-            className="form-control col-5"
-            name="content"
-            onChange={this.handleChange}
-            value={this.state.content}
-          ></input>
-          <button type="submit" className="btn btn-submit mt-0 mx-2">
-            Send
-          </button>
-        </form>
+          </main>
+          <form onSubmit={this.handleSubmit} className="chat-inputarea">
+            <input
+              type="text"
+              placeholder="Message..."
+              className="chat-input"
+              name="content"
+              onChange={this.handleChange}
+              value={this.state.content}
+              autoFocus
+            ></input>
+            <button type="submit" className="chat-sendbtn">
+              Send
+            </button>
+          </form>
+        </section>
       </div>
     );
   }
