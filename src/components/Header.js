@@ -5,7 +5,7 @@ import { auth } from '../services/firebase';
 function Header() {
   return (
     <header>
-      <nav className="navbar navbar-expand-sm fixed-top navbar-light bg-light">
+      <nav className="navbar navbar-expand-sm fixed-top navbar-light bg-transparent">
         <Link className="navbar-brand" to="/">Chatalone</Link>
         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
