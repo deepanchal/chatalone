@@ -2,14 +2,12 @@ import React, { Component } from "react";
 import Header from "../components/Header";
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
-// import { firestore } from "../services/firebase";
 
 export default class Chatlist extends Component {
   constructor(props) {
     super(props);
     this.state = {
       user: auth().currentUser,
-      allusers: [],
       inputVal: "",
       error: null,
     };

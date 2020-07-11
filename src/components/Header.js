@@ -13,7 +13,6 @@ function Header() {
         <div className="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
           {auth().currentUser
             ? <div className="navbar-nav">
-              <Link className="nav-item nav-link mr-3" to="/chatlist">Chatlist</Link>
               <Link className="nav-item nav-link mr-3" to="/chat">Chat</Link>
               <Link className="nav-item nav-link mr-3" to="/chatroom">Chatroom</Link>
           <button className="btn btn-primary mt-0 mr-3" onClick={() => auth().signOut()}>Logout {auth().currentUser.displayName}</button>
