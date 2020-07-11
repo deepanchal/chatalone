@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, BrowserRouter as Router, Switch, Redirect } from "react-router-dom";
+import { Route, HashRouter as Router, Switch, Redirect } from "react-router-dom";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Chatroom from "./pages/Chatroom";
@@ -29,7 +29,7 @@ function PublicRoute({ component: Component, authenticated, ...rest }) {
     <Route
       {...rest}
       render={(props) =>
-        authenticated === false ? <Component {...props} /> : <Redirect to="/chatlist" />
+        authenticated === false ? <Component {...props} /> : <Redirect to="/chat" />
       }
     />
   );
@@ -62,9 +62,7 @@ class App extends Component {
 
   render() {
     return this.state.loading === true ? (
-      <div className="d-flex justify-content-center align-items-center" style={{height: "100vh"}}>
         <div className="spinner"></div>
-      </div>
     ) : (
       <Router>
         <Switch>
@@ -75,14 +73,15 @@ class App extends Component {
             component={Chatroom}
           />
           <PrivateRoute
+            exact
+            path="/chat"
+            authenticated={this.state.authenticated}
+            component={Chatlist}
+          />
+          <PrivateRoute
             path="/chat/:chatID"
             authenticated={this.state.authenticated}
             component={Chat}
-          />
-          <PrivateRoute
-            path="/chatlist"
-            authenticated={this.state.authenticated}
-            component={Chatlist}
           />
           <PublicRoute
             path="/signup"
