@@ -66,6 +66,10 @@ export default class Chat extends Component {
     if (this.state.content) {
       try {
         const chatid = this.props.match.params.chatID;
+        if (!chatid.split("_").includes(this.state.user.uid)) {
+          this.props.history.push("/chat");
+          throw { message: "You shouldn't be here 🤨" };
+        }
         await db.ref(`chats/${chatid}`).push({
           content: this.state.content,
           timestamp: Date.now(),
@@ -106,26 +110,25 @@ export default class Chat extends Component {
   render() {
     return (
       <div className="content">
-        {this.state.readError ? (
-          <div className="alert alert-danger py-1" role="alert">
-            {this.state.readError}
-          </div>
-        ) : null}
-
         {/* loading indicator */}
         {this.state.loadingChats ? <div className="spinner"></div> : ""}
         <section className="chat-container">
           <header className="chat-header">
-            <Link to="/chat">
+            <Link to="/chat" className="px-2">
               <i className="fas fa-chevron-left"></i>
             </Link>
             <div className="chat-header-title">{this.state.friendName}</div>
             <div className="chat-settings">
-              <Link to="/settings">
+              <Link to="/" className="px-2">
                 <i className="fas fa-cog"></i>
               </Link>
             </div>
           </header>
+          {this.state.readError ? (
+            <div className="alert alert-danger py-0 rounded-0" role="alert">
+              {this.state.readError}
+            </div>
+          ) : null}
 
           <main className="chatarea" ref={this.myRef}>
             {/* chat area */}

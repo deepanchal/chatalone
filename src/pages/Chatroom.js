@@ -81,26 +81,29 @@ export default class Chatroom extends Component {
   render() {
     return (
       <div className="">
-        {this.state.readError ? (
-          <div className="alert alert-danger py-1" role="alert">
-            {this.state.readError}
-          </div>
-        ) : null}
-
         {/* loading indicator */}
         {this.state.loadingChats ? <div className="spinner"></div> : ""}
         <section className="chat-container">
           <header className="chat-header">
-            <Link to="/chat">
+            <Link to="/chat" className="px-2">
               <i className="fas fa-chevron-left"></i>
             </Link>
             <div className="chat-header-title">Chatroom</div>
             <div className="chat-settings">
-              <Link to="/settings">
+              <Link to="/" className="px-2">
                 <i className="fas fa-cog"></i>
               </Link>
             </div>
           </header>
+          {this.state.readError ? (
+            <div className="alert alert-danger py-0 m-0 rounded-0" role="alert">
+              {this.state.readError}
+            </div>
+          ) : this.state.writeError ? (
+            <div className="alert alert-danger py-0 m-0 rounded-0" role="alert">
+              {this.state.writeError}
+            </div>
+          ) : null}
 
           <main className="chatarea" ref={this.myRef}>
             {/* chat area */}
@@ -115,7 +118,9 @@ export default class Chatroom extends Component {
                   <div className="chat-bubble">
                     <div className="chat-info">
                       <div className="chat-info-name noselect">{chat.uname}</div>
-                      <div className="chat-info-time noselect">{this.formatTime(chat.timestamp)}</div>
+                      <div className="chat-info-time noselect">
+                        {this.formatTime(chat.timestamp)}
+                      </div>
                     </div>
                     <div className="msg-text">{chat.content}</div>
                   </div>
@@ -134,6 +139,7 @@ export default class Chatroom extends Component {
               autoFocus
             ></input>
             <button type="submit" className="chat-sendbtn">
+              {/* <i className="far fa-paper-plane"></i> */}
               Send
             </button>
           </form>
