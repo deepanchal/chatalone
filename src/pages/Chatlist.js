@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Header from "../components/Header";
+import { Link } from "react-router-dom";
 import { auth } from "../services/firebase";
 import { db } from "../services/firebase";
 
@@ -10,13 +11,34 @@ export default class Chatlist extends Component {
       user: auth().currentUser,
       inputVal: "",
       error: null,
+      friendsList: [],
+      loading: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.chatIDGenerator = this.chatIDGenerator.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({ error: null, loading: true });
+    const chatContainer = document.querySelector(".chat-container");
+    chatContainer.style.height = window.innerHeight + "px";
+
+    db.ref(`users/${this.state.user.uid}/friends`)
+      .once("value")
+      .then((snapshot) => {
+        let list = [];
+        snapshot.forEach((snap) => {
+          list.push(snap.val());
+        });
+        this.setState({ friendsList: list });
+        console.log(this.state.friendsList);
+        this.setState({ loading: false });
+      })
+      .catch((error) => {
+        this.setState({ error: error.message, loading: false });
+      });
+  }
 
   handleChange(event) {
     this.setState({
@@ -26,12 +48,17 @@ export default class Chatlist extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    if (this.state.inputVal) {
+    this.startChat(this.state.inputVal);
+  }
+
+  async startChat(email) {
+    if (email) {
       try {
         const senderID = this.state.user.uid;
-        const receiverID = await this.emailToID(this.state.inputVal);
+        const receiverID = await this.emailToID(email);
         if (!receiverID) throw { message: "No friend found with that email 😕" };
         if (receiverID === senderID) throw { message: "You can't text yourself 💩" };
+        this.addFriendToList(receiverID);
         const chatID = this.chatIDGenerator(this.state.user.uid, receiverID);
         this.props.history.push("/chat/" + chatID);
       } catch (error) {
@@ -42,7 +69,7 @@ export default class Chatlist extends Component {
 
   async emailToID(email) {
     return db
-      .ref("/users")
+      .ref("users")
       .once("value")
       .then(function (snapshot) {
         for (const key in snapshot.val()) {
@@ -58,6 +85,22 @@ export default class Chatlist extends Component {
       });
   }
 
+  async addFriendToList(friendID) {
+    const friendObj = await db
+      .ref(`users/${friendID}`)
+      .once("value")
+      .then((snapshot) => {
+        var result = snapshot.val();
+        delete result.friends;
+        return result;
+      })
+      .catch((err) => {
+        return {};
+      });
+    friendObj.chatID = this.chatIDGenerator(this.state.user.uid, friendID);
+    return db.ref(`users/${this.state.user.uid}/friends/${friendID}`).set(friendObj);
+  }
+
   chatIDGenerator(ID1, ID2) {
     if (ID1 < ID2) return `${ID1}_${ID2}`;
     else return `${ID2}_${ID1}`;
@@ -65,30 +108,75 @@ export default class Chatlist extends Component {
 
   render() {
     return (
-      <div className="container">
-        <Header />
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ marginTop: "4.5rem" }}
-        >
-          <form onSubmit={this.handleSubmit} className="d-flex justify-content-center">
+      <div className="content">
+        {/* loading indicator */}
+        {this.state.loading ? <div className="spinner"></div> : ""}
+        <div className="chat-container">
+          <header className="chat-header">
+            <Link to="/" className="px-2">
+              <i className="fas fa-chevron-left"></i>
+            </Link>
+            <div className="chat-header-title">
+              <Link to="/">Chatalone</Link>
+            </div>
+            <div className="chat-settings">
+              <Link onClick={() => auth().signOut()} className="px-2">
+                <i class="fas fa-sign-out-alt"></i>
+              </Link>
+            </div>
+          </header>
+          <div className="alert alert-success m-0 py-0 rounded-0" role="alert">
+            Logged in: {this.state.user.displayName} ({this.state.user.email})
+          </div>
+          {this.state.error ? (
+            <div className="alert alert-danger m-0 py-0 rounded-0" role="alert">
+              {this.state.error}
+            </div>
+          ) : null}
+
+          <form onSubmit={this.handleSubmit} className="chat-inputarea mt-2">
             <input
               type="email"
-              placeholder="your friend's email..."
+              placeholder="Your friend's email..."
               name="inputVal"
               onChange={this.handleChange}
-              className="form-control col-10"
+              className="chat-input"
             ></input>
-            <button type="submit" className="form-control btn btn-submit mx-2 px-4">
+            <button type="submit" className="chat-sendbtn">
               Chat
             </button>
           </form>
+
+          <main className="chatarea px-0">
+            <ul className="list-group">
+              <Link
+                to={"/chatroom"}
+                className="list-group-item list-group-item-action list-group-item-primary rounded-0"
+              >
+                <div className="d-flex w-100 justify-content-between">
+                  <h5 className="my-2 font-weight-bold">
+                    Public Chatroom <i class="fas fa-arrow-right"></i>
+                  </h5>
+                </div>
+              </Link>
+              {this.state.friendsList.map((friend) => {
+                return (
+                  <Link
+                    key={friend.uid}
+                    to={"/chat/" + friend.chatID}
+                    className="list-group-item list-group-item-action rounded-0"
+                  >
+                    <div className="d-flex w-100 justify-content-between">
+                      <h5 className="mb-1 font-weight-bold">{friend.uname}</h5>
+                      <small></small>
+                    </div>
+                    <small>{friend.email}</small>
+                  </Link>
+                );
+              })}
+            </ul>
+          </main>
         </div>
-        {this.state.error ? (
-          <div className="alert alert-danger" role="alert">
-            {this.state.error}
-          </div>
-        ) : null}
       </div>
     );
   }
