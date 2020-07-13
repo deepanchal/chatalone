@@ -76,6 +76,7 @@ body {
 }
 
 .animated-bg form {
+  max-width: 500px;
   border-radius: 10px;
   border: var(--border);
 }
