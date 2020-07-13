@@ -22,8 +22,6 @@ export default class Chatroom extends Component {
   async componentDidMount() {
     this.setState({ readError: null, loadingChats: true });
     const chatArea = this.myRef.current;
-    const chatContainer = document.querySelector("section.chat-container");
-    chatContainer.style.height = window.innerHeight + "px";
     try {
       db.ref("chatroom").on("value", (snapshot) => {
         let chats = [];
@@ -136,7 +134,6 @@ export default class Chatroom extends Component {
               name="content"
               onChange={this.handleChange}
               value={this.state.content}
-              autoFocus
             ></input>
             <button type="submit" className="chat-sendbtn">
               {/* <i className="far fa-paper-plane"></i> */}

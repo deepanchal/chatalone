@@ -23,11 +23,7 @@ export default class Chat extends Component {
 
   async componentDidMount() {
     this.setState({ readError: null, loadingChats: true });
-
     const chatArea = this.myRef.current;
-    const chatContainer = document.querySelector("section.chat-container");
-    chatContainer.style.height = window.innerHeight + "px";
-
     try {
       const chatid = this.props.match.params.chatID;
       if (!chatid.split("_").includes(this.state.user.uid)) {
@@ -109,7 +105,7 @@ export default class Chat extends Component {
 
   render() {
     return (
-      <div className="content">
+      <div>
         {/* loading indicator */}
         {this.state.loadingChats ? <div className="spinner"></div> : ""}
         <section className="chat-container">
@@ -159,7 +155,6 @@ export default class Chat extends Component {
               name="content"
               onChange={this.handleChange}
               value={this.state.content}
-              autoFocus
             ></input>
             <button type="submit" className="chat-sendbtn">
               Send

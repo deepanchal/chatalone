@@ -20,9 +20,6 @@ export default class Chatlist extends Component {
 
   componentDidMount() {
     this.setState({ error: null, loading: true });
-    const chatContainer = document.querySelector(".chat-container");
-    chatContainer.style.height = window.innerHeight + "px";
-
     db.ref(`users/${this.state.user.uid}/friends`)
       .once("value")
       .then((snapshot) => {
@@ -107,7 +104,7 @@ export default class Chatlist extends Component {
 
   render() {
     return (
-      <div className="content">
+      <div>
         {/* loading indicator */}
         {this.state.loading ? <div className="spinner"></div> : ""}
         <div className="chat-container">

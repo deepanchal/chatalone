@@ -45,6 +45,15 @@ class App extends Component {
   }
 
   componentDidMount() {
+    // Eventlistener for changing viewport height to avoid bad user experience for mobile users
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+
+    window.addEventListener("resize", () => {
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    });
+
     auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({
@@ -62,7 +71,7 @@ class App extends Component {
 
   render() {
     return this.state.loading === true ? (
-        <div className="spinner"></div>
+      <div className="spinner"></div>
     ) : (
       <Router>
         <Switch>
