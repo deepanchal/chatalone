@@ -1,27 +1,33 @@
-import React, { Component } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { Link } from 'react-router-dom';
+import { auth } from "firebase";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 export default class HomePage extends Component {
   render() {
     return (
-      <div className="home">
-        <Header></Header>
-        <section>
-          <div className="jumbotron jumbotron-fluid py-5">
-            <div className="container text-center py-5">
-              <h1 className="display-4">Chatalone</h1>
-              <p className="lead">Chat alone with Friends!!</p>
-              <div className="mt-4">
-                <Link className="btn btn-primary px-5 mr-3" to="/signup">Create New Account</Link>
-                <Link className="btn px-5" to="/login">Login to Your Account</Link>
-              </div>
-            </div>
+      <div className="animated-bg">
+        <h1 className="display-4">Chatalone</h1>
+        <h4 className="">Chat Alone with friends!!</h4>
+        {auth().currentUser ? (
+          <div className="">
+            <Link to="/chat" className="btn btn-primary btn-lg m-2">
+              Chat
+            </Link>
+            <Link to="/chatroom" className="btn btn-secondary btn-lg m-2">
+              Chatroom
+            </Link>
           </div>
-        </section>
-        <Footer></Footer>
+        ) : (
+          <div className="">
+            <Link to="/signup" className="btn btn-primary btn-lg m-2">
+              <i class="fas fa-user-plus"></i> Signup
+            </Link>
+            <Link to="/login" className="btn btn-secondary btn-lg m-2">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </Link>
+          </div>
+        )}
       </div>
-    )
+    );
   }
 }

@@ -50,52 +50,47 @@ export default class Login extends Component {
 
   render() {
     return (
-      <div className="container">
-        <form className="mt-5 py-5 px-5" autoComplete="off" onSubmit={this.handleSubmit}>
-          <h1>
+      <div className="animated-bg">
+        <form className="p-3 mx-3 bg-light" autoComplete="off" onSubmit={this.handleSubmit}>
+          <h3 className="mb-3">
             Login to
             <Link className="title ml-2" to="/">
               Chatalone
             </Link>
-          </h1>
-          <p className="lead">Fill in the form below to login to your account.</p>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Email"
-              name="email"
-              type="email"
-              onChange={this.handleChange}
-              value={this.state.email}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Password"
-              name="password"
-              onChange={this.handleChange}
-              value={this.state.password}
-              type="password"
-            />
-          </div>
-          <div className="form-group">
-            {this.state.error ? <p className="text-danger">{this.state.error}</p> : null}
-            <button className="btn btn-primary px-5" type="submit">
-              Login
-            </button>
-          </div>
-          <p>You can also log in with any of these services</p>
-          <button className="btn btn-danger mr-2" type="button" onClick={this.googleSignIn}>
-            Sign in with Google
+          </h3>
+          {this.state.error ? (
+            <div className="alert alert-danger py-0">{this.state.error}</div>
+          ) : null}
+          <input
+            className="form-control mb-2"
+            placeholder="Email"
+            name="email"
+            type="email"
+            onChange={this.handleChange}
+            value={this.state.email}
+          />
+          <input
+            className="form-control mb-2"
+            placeholder="Password"
+            name="password"
+            onChange={this.handleChange}
+            value={this.state.password}
+            type="password"
+          />
+          <button className="btn btn-primary px-5" type="submit">
+            <i class="fas fa-sign-in-alt"></i> Login
           </button>
-          <button className="btn btn-secondary" type="button" onClick={this.githubSignIn}>
-            Sign in with GitHub
+          <hr className="my-2" />
+          <button className="btn btn-danger m-1" type="button" onClick={this.googleSignIn}>
+            <i class="fab fa-google"></i> Sign in with Google
           </button>
-          <hr />
-          <p>
+          <button className="btn btn-secondary m-1" type="button" onClick={this.githubSignIn}>
+            <i class="fab fa-github"></i> Sign in with GitHub
+          </button>
+          <hr className="my-2" />
+          <h6>
             Don't have an account? <Link to="/signup">Sign up</Link>
-          </p>
+          </h6>
         </form>
       </div>
     );

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
 import "../helpers/auth";
 import {
   signup,
@@ -63,63 +62,55 @@ export default class SignUp extends Component {
 
   render() {
     return (
-      <div className="container">
-        <Header />
-        <form className="mt-5 py-5 px-5" onSubmit={this.handleSubmit}>
-          <h1>
-            Sign Up to
-            <Link className="title ml-2" to="/">
+      <div className="animated-bg">
+        <form className="p-3 mx-3 bg-light" onSubmit={this.handleSubmit}>
+          <h3 className="mb-3">
+            Signup to
+            <Link className="ml-2" to="/">
               Chatalone
             </Link>
-          </h1>
-          <p className="lead">Fill in the form below to create an account.</p>
-          {this.state.error ? <p className="text-danger">{this.state.error}</p> : null}
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Name"
-              name="name"
-              type="text"
-              onChange={this.handleChange}
-              value={this.state.name}
-            ></input>
-          </div>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Email"
-              name="email"
-              type="email"
-              onChange={this.handleChange}
-              value={this.state.email}
-            ></input>
-          </div>
-          <div className="form-group">
-            <input
-              className="form-control"
-              placeholder="Password"
-              name="password"
-              onChange={this.handleChange}
-              value={this.state.password}
-              type="password"
-            ></input>
-          </div>
-          <div className="form-group">
-            <button className="btn btn-primary px-5" type="submit">
-              Sign up
-            </button>{" "}
-            OR
-            <button className="btn btn-danger mx-2" type="button" onClick={this.googleSignIn}>
-              Sign up with Google
-            </button>
-          </div>
-          {/* <button className="btn btn-secondary" type="button" onClick={this.githubSignIn}>
-            Sign up with GitHub
-          </button> */}
-          <hr></hr>
-          <p>
+          </h3>
+          {this.state.error ? (
+            <div className="alert alert-danger py-0">{this.state.error}</div>
+          ) : null}
+          <input
+            className="form-control mb-2"
+            placeholder="Name"
+            name="name"
+            type="text"
+            onChange={this.handleChange}
+            value={this.state.name}
+          ></input>
+          <input
+            className="form-control mb-2"
+            placeholder="Email"
+            name="email"
+            type="email"
+            onChange={this.handleChange}
+            value={this.state.email}
+          ></input>
+          <input
+            className="form-control mb-2"
+            placeholder="Password"
+            name="password"
+            onChange={this.handleChange}
+            value={this.state.password}
+            type="password"
+          ></input>
+          <button className="btn btn-primary px-5" type="submit">
+            <i class="fas fa-user-plus"></i> Signup
+          </button>
+          <hr className="my-2" />
+          <button className="btn btn-danger m-1" type="button" onClick={this.googleSignIn}>
+            <i class="fab fa-google"></i> Sign up with Google
+          </button>
+          <button className="btn btn-secondary m-1" type="button" onClick={this.githubSignIn}>
+            <i class="fab fa-github"></i> Sign up with GitHub
+          </button>
+          <hr className="my-2" />
+          <h6 className="mb-0">
             Already have an account? <Link to="/login">Login</Link>
-          </p>
+          </h6>
         </form>
       </div>
     );
