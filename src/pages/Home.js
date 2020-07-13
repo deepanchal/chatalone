@@ -20,10 +20,10 @@ export default class HomePage extends Component {
         ) : (
           <div className="">
             <Link to="/signup" className="btn btn-primary btn-lg m-2">
-              <i class="fas fa-user-plus"></i> Signup
+              <i className="fas fa-user-plus"></i> Signup
             </Link>
             <Link to="/login" className="btn btn-secondary btn-lg m-2">
-              <i class="fas fa-sign-in-alt"></i> Login
+              <i className="fas fa-sign-in-alt"></i> Login
             </Link>
           </div>
         )}

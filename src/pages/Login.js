@@ -78,14 +78,14 @@ export default class Login extends Component {
             type="password"
           />
           <button className="btn btn-primary px-5" type="submit">
-            <i class="fas fa-sign-in-alt"></i> Login
+            <i className="fas fa-sign-in-alt"></i> Login
           </button>
           <hr className="my-2" />
           <button className="btn btn-danger m-1" type="button" onClick={this.googleSignIn}>
-            <i class="fab fa-google"></i> Sign in with Google
+            <i className="fab fa-google"></i> Sign in with Google
           </button>
           <button className="btn btn-secondary m-1" type="button" onClick={this.githubSignIn}>
-            <i class="fab fa-github"></i> Sign in with GitHub
+            <i className="fab fa-github"></i> Sign in with GitHub
           </button>
           <hr className="my-2" />
           <h6>
