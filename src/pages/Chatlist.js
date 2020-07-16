@@ -18,22 +18,28 @@ export default class Chatlist extends Component {
     this.chatIDGenerator = this.chatIDGenerator.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({ error: null, loading: true });
-    db.ref(`users/${this.state.user.uid}/friends`)
-      .once("value")
-      .then((snapshot) => {
-        let list = [];
-        snapshot.forEach((snap) => {
-          list.push(snap.val());
-        });
-        this.setState({ friendsList: list });
-        console.log(this.state.friendsList);
-        this.setState({ loading: false });
-      })
-      .catch((error) => {
-        this.setState({ error: error.message, loading: false });
-      });
+    try {
+      const snapshot = await db.ref(`users/${this.state.user.uid}/friends`).once("value");
+      let list = [];
+      for (const key in snapshot.val()) {
+        if (snapshot.val().hasOwnProperty(key)) {
+          var element = snapshot.val()[key];
+          // Getting last chat message info with chatID
+          var lastMsg = await db.ref(`chats/${element.chatID}`).limitToLast(1).once("value");
+          if (lastMsg.exists()) {
+            const val = lastMsg.val();
+            element["lastMsg"] = val[Object.keys(val)[0]].content;
+            element["lastMsgTimestamp"] = val[Object.keys(val)[0]].timestamp;
+          }
+          list.push(element);
+        }
+      }
+      this.setState({ friendsList: list, loading: false });
+    } catch (err) {
+      this.setState({ error: err.message, loading: false });
+    }
   }
 
   handleChange(event) {
@@ -44,18 +50,15 @@ export default class Chatlist extends Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    this.startChat(this.state.inputVal);
-  }
-
-  async startChat(email) {
-    if (email) {
+    this.setState({ error: null });
+    const senderID = this.state.user.uid;
+    if (this.state.inputVal) {
       try {
-        const senderID = this.state.user.uid;
-        const receiverID = await this.emailToID(email);
+        const receiverID = await this.emailToID(this.state.inputVal);
         if (!receiverID) throw { message: "No friend found with that email 😕" };
         if (receiverID === senderID) throw { message: "You can't text yourself 💩" };
-        this.addFriendToList(receiverID);
-        const chatID = this.chatIDGenerator(this.state.user.uid, receiverID);
+        await this.makeFriends(senderID, receiverID);
+        const chatID = this.chatIDGenerator(senderID, receiverID);
         this.props.history.push("/chat/" + chatID);
       } catch (error) {
         this.setState({ error: error.message });
@@ -64,38 +67,65 @@ export default class Chatlist extends Component {
   }
 
   async emailToID(email) {
-    return db
-      .ref("users")
-      .once("value")
-      .then(function (snapshot) {
-        for (const key in snapshot.val()) {
-          // skip loop if the property is from prototype
-          if (!snapshot.val().hasOwnProperty(key)) continue;
-          const obj = snapshot.val()[key];
-          for (const prop in obj) {
-            // skip loop if the property is from prototype
-            if (!obj.hasOwnProperty(prop)) continue;
-            if (prop === "email" && obj[prop] === email) return obj["uid"];
-          }
-        }
-      });
+    const snapshot = await db.ref("users").once("value");
+    for (const key in snapshot.val()) {
+      // skip loop if the property is from prototype
+      if (!snapshot.val().hasOwnProperty(key)) continue;
+      const obj = snapshot.val()[key];
+      for (const prop in obj) {
+        // skip loop if the property is from prototype
+        if (!obj.hasOwnProperty(prop)) continue;
+        if (prop === "email" && obj[prop] === email) return obj["uid"];
+      }
+    }
+    return null;
   }
 
-  async addFriendToList(friendID) {
-    const friendObj = await db
-      .ref(`users/${friendID}`)
-      .once("value")
-      .then((snapshot) => {
-        var result = snapshot.val();
-        delete result.friends;
-        return result;
-      })
-      .catch((err) => {
-        return {};
-      });
-    friendObj.chatID = this.chatIDGenerator(this.state.user.uid, friendID);
-    return db.ref(`users/${this.state.user.uid}/friends/${friendID}`).set(friendObj);
+  async makeFriends(currentUserID, friendID) {
+    const currentUserObj = await (await db.ref(`users/${currentUserID}`).once("value")).val();
+    currentUserObj.chatID = this.chatIDGenerator(currentUserID, friendID);
+    delete currentUserObj.friends;  // deleting additional user property
+
+    const friendObj = await (await db.ref(`users/${friendID}`).once("value")).val();
+    friendObj.chatID = this.chatIDGenerator(currentUserID, friendID);
+    delete friendObj.friends;       // deleting additional user property
+
+    return (
+      db.ref(`users/${currentUserID}/friends/${friendID}`).set(friendObj) &&
+      db.ref(`users/${friendID}/friends/${currentUserID}`).set(currentUserObj)
+    )   // Adding new Friend in both user's document
   }
+
+  timeSince(timeStamp) {
+    if (!timeStamp) return null;
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    var elapsed = Date.now() - timeStamp;
+
+    if (elapsed < msPerMinute) {
+      const x = Math.round(elapsed / 1000);
+      return x === 1 ? x + " second ago" : x + " seconds ago";
+    } else if (elapsed < msPerHour) {
+      const x = Math.round(elapsed / msPerMinute);
+      return x === 1 ? x + " minute ago" : x + " minutes ago";
+    } else if (elapsed < msPerDay) {
+      const x = Math.round(elapsed / msPerHour);
+      return x === 1 ? x + " hour ago" : x + " hours ago";
+    } else if (elapsed < msPerMonth) {
+      const x = Math.round(elapsed / msPerDay);
+      return x === 1 ? x + " day ago" : x + " days ago";
+    } else if (elapsed < msPerYear) {
+      const x = Math.round(elapsed / msPerMonth);
+      return x === 1 ? x + " month ago" : x + " months ago";
+    } else {
+      const x = Math.round(elapsed / msPerYear);
+      return x === 1 ? x + " year ago" : x + " years ago";
+    }
+  }   // function to convert unix timestamp to relative time
 
   chatIDGenerator(ID1, ID2) {
     if (ID1 < ID2) return `${ID1}_${ID2}`;
@@ -116,8 +146,8 @@ export default class Chatlist extends Component {
               <Link to="/">Chatalone</Link>
             </div>
             <div className="chat-settings">
-              <Link onClick={() => auth().signOut()} className="px-2">
-                <i class="fas fa-sign-out-alt"></i>
+              <Link onClick={() => auth().signOut()} to="/" className="px-2">
+                <i className="fas fa-sign-out-alt"></i>
               </Link>
             </div>
           </header>
@@ -151,22 +181,25 @@ export default class Chatlist extends Component {
               >
                 <div className="d-flex w-100 justify-content-between">
                   <h5 className="my-2 font-weight-bold">
-                    Public Chatroom <i class="fas fa-arrow-right"></i>
+                    Public Chatroom <i className="fas fa-arrow-right"></i>
                   </h5>
                 </div>
               </Link>
-              {this.state.friendsList.map((friend) => {
+              {this.state.friendsList.map((friend, index) => {
                 return (
                   <Link
-                    key={friend.uid}
+                    key={index}
                     to={"/chat/" + friend.chatID}
                     className="list-group-item list-group-item-action rounded-0"
                   >
                     <div className="d-flex w-100 justify-content-between">
-                      <h5 className="mb-1 font-weight-bold">{friend.uname}</h5>
-                      <small></small>
+                      <h5 className="mb-0 font-weight-bold">{friend.uname}</h5>
+                      <small className="text-right">
+                        {this.timeSince(friend.lastMsgTimestamp)}
+                      </small>
                     </div>
-                    <small>{friend.email}</small>
+                    <small className="mb-1">{friend.email}</small>
+                    <small className="text-muted">{friend.lastMsg}</small>
                   </Link>
                 );
               })}
