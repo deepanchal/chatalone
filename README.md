@@ -2,6 +2,8 @@
 
 Chat alone with your friends!!
 
+![screenshot](screenshots/chatalone.png)
+
 ## Credits
 
 This project was inspired by Deven Rathore's article: [Building a Real-Time Chat App with React and Firebase](https://css-tricks.com/building-a-real-time-chat-app-with-react-and-firebase/)
