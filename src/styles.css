@@ -117,6 +117,14 @@ form button.btn {
   padding: 8px;
 }
 
+.list-group-item small:last-of-type {
+  overflow: hidden;
+  width: 150px;
+  text-overflow: ellipsis;
+  display: block;
+  white-space: nowrap;
+}
+
 .msg {
   display: flex;
   align-items: flex-end;
@@ -220,7 +228,7 @@ form button.btn {
   left: calc(50% - 35px);
   border: 8px solid var(--primary-bg);
   border-radius: 50%;
-  border-top-color: #fcfcfc;
+  border-top-color: transparent;
   animation: spin 700ms linear infinite;
   -webkit-animation: spin 700ms linear infinite;
 }
