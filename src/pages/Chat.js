@@ -12,6 +12,8 @@ export default class Chat extends Component {
       friendName: null,
       chats: [],
       content: "",
+      deletePrompt: false,
+      deletionMsgRef: "",
       readError: null,
       writeError: null,
       loadingChats: false,
@@ -41,9 +43,9 @@ export default class Chat extends Component {
           return a.timestamp - b.timestamp;
         });
         this.setState({ chats });
-        chatArea.scrollBy(0, chatArea.scrollHeight);
         this.setState({ loadingChats: false });
       });
+      chatArea.scrollBy(0, chatArea.scrollHeight);
     } catch (error) {
       this.setState({ readError: error.message, loadingChats: false });
     }
@@ -96,10 +98,7 @@ export default class Chat extends Component {
 
   formatTime(timestamp) {
     const d = new Date(timestamp);
-    // const time = `${d.getDate()}/${
-    //   d.getMonth() + 1
-    // }/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
-    const time = d.toLocaleTimeString();
+    const time = d.toLocaleTimeString().replace(/(.*)\D\d+/, "$1");
     return time;
   }
 
@@ -136,17 +135,58 @@ export default class Chat extends Component {
                     "msg " + (this.state.user.uid === chat.uid ? "right-msg" : "left-msg")
                   }
                 >
-                  <div className="chat-bubble">
-                    {/* <div className="chat-info">
-                      <div className="chat-info-name noselect">{chat.uname}</div>
-                      <div className="chat-info-time noselect">{this.formatTime(chat.timestamp)}</div>
-                    </div> */}
+                  <div
+                    className="chat-bubble"
+                    onDoubleClick={async () => {
+                      if (chat.uid !== this.state.user.uid) return;
+                      const chatid = this.props.match.params.chatID;
+                      this.setState({ deletePrompt: true });
+                      const x = await db
+                        .ref(`chats/${chatid}`)
+                        .orderByChild("timestamp")
+                        .equalTo(chat.timestamp)
+                        .once("value");
+                      this.setState({
+                        deletionMsgRef: `chats/${chatid}/${Object.keys(x.val())[0]}`,
+                      });
+                    }}
+                  >
                     <div className="msg-text">{chat.content}</div>
+                    <div className="chat-info-time noselect text-right">
+                      {this.formatTime(chat.timestamp)}
+                    </div>
                   </div>
                 </div>
               );
             })}
           </main>
+          {this.state.deletePrompt ? (
+            <div
+              className="d-flex justify-content-between align-items-center alert alert-danger mb-0 mt-1 rounded-0 py-1 px-2"
+              role="alert"
+            >
+              <span>Do you wish to delete that message?</span>
+              <div className="d-flex">
+                <button
+                  type="button"
+                  className="btn btn-sm py-0 mr-1 btn-outline-danger"
+                  onClick={() => {
+                    db.ref(this.state.deletionMsgRef).remove();
+                    this.setState({ deletePrompt: false });
+                  }}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm py-0 btn-outline-success"
+                  onClick={() => this.setState({ deletePrompt: false })}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          ) : null}
           <form onSubmit={this.handleSubmit} className="chat-inputarea">
             <input
               type="text"
