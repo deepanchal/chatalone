@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap"); */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 :root {
   --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -25,7 +26,8 @@ html {
 }
 
 body {
-  font-family: "Raleway", sans-serif;
+  /* font-family: "Raleway", sans-serif; */
+  font-family: 'Open Sans', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -137,6 +139,7 @@ form button.btn {
 
 .chat-bubble {
   max-width: 270px;
+  min-width: 100px;
   color: white;
   word-wrap: break-word;
   padding: 6px 18px;
@@ -158,7 +161,7 @@ form button.btn {
 }
 
 .chat-info-time {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
 .left-msg .chat-bubble {
