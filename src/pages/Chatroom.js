@@ -69,10 +69,7 @@ export default class Chatroom extends Component {
 
   formatTime(timestamp) {
     const d = new Date(timestamp);
-    // const time = `${d.getDate()}/${
-    //   d.getMonth() + 1
-    // }/${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`;
-    const time = d.toLocaleTimeString();
+    const time = d.toLocaleTimeString().replace(/(.*)\D\d+/, "$1");
     return time;
   }
 
