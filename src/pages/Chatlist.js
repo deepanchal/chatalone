@@ -26,12 +26,12 @@ export default class Chatlist extends Component {
       for (const key in snapshot.val()) {
         if (snapshot.val().hasOwnProperty(key)) {
           var element = snapshot.val()[key];
-          // Getting last chat message info with chatID
-          var lastMsg = await db.ref(`chats/${element.chatID}`).limitToLast(1).once("value");
-          if (lastMsg.exists()) {
-            const val = lastMsg.val();
-            element["lastMsg"] = val[Object.keys(val)[0]].content;
-            element["lastMsgTimestamp"] = val[Object.keys(val)[0]].timestamp;
+          // Getting recent chat message info with chatID
+          var recentMsg = await db.ref(`chats/${element.chatID}`).limitToLast(1).once("value");
+          if (recentMsg.exists()) {
+            const val = recentMsg.val();
+            element["recentMsg"] = val[Object.keys(val)[0]].content;
+            element["recentMsgTimestamp"] = val[Object.keys(val)[0]].timestamp;
           }
           list.push(element);
         }
@@ -84,16 +84,16 @@ export default class Chatlist extends Component {
   async makeFriends(currentUserID, friendID) {
     const currentUserObj = await (await db.ref(`users/${currentUserID}`).once("value")).val();
     currentUserObj.chatID = this.chatIDGenerator(currentUserID, friendID);
-    delete currentUserObj.friends;  // deleting additional user property
+    delete currentUserObj.friends; // deleting additional user property
 
     const friendObj = await (await db.ref(`users/${friendID}`).once("value")).val();
     friendObj.chatID = this.chatIDGenerator(currentUserID, friendID);
-    delete friendObj.friends;       // deleting additional user property
+    delete friendObj.friends; // deleting additional user property
 
     return (
       db.ref(`users/${currentUserID}/friends/${friendID}`).set(friendObj) &&
       db.ref(`users/${friendID}/friends/${currentUserID}`).set(currentUserObj)
-    )   // Adding new Friend in both user's document
+    ); // Adding new Friend in both user's document
   }
 
   timeSince(timeStamp) {
@@ -107,25 +107,25 @@ export default class Chatlist extends Component {
     var elapsed = Date.now() - timeStamp;
 
     if (elapsed < msPerMinute) {
-      const x = Math.round(elapsed / 1000);
+      const x = Math.floor(elapsed / 1000);
       return x === 1 ? x + " second ago" : x + " seconds ago";
     } else if (elapsed < msPerHour) {
-      const x = Math.round(elapsed / msPerMinute);
+      const x = Math.floor(elapsed / msPerMinute);
       return x === 1 ? x + " minute ago" : x + " minutes ago";
     } else if (elapsed < msPerDay) {
-      const x = Math.round(elapsed / msPerHour);
+      const x = Math.floor(elapsed / msPerHour);
       return x === 1 ? x + " hour ago" : x + " hours ago";
     } else if (elapsed < msPerMonth) {
-      const x = Math.round(elapsed / msPerDay);
+      const x = Math.floor(elapsed / msPerDay);
       return x === 1 ? x + " day ago" : x + " days ago";
     } else if (elapsed < msPerYear) {
-      const x = Math.round(elapsed / msPerMonth);
+      const x = Math.floor(elapsed / msPerMonth);
       return x === 1 ? x + " month ago" : x + " months ago";
     } else {
-      const x = Math.round(elapsed / msPerYear);
+      const x = Math.floor(elapsed / msPerYear);
       return x === 1 ? x + " year ago" : x + " years ago";
     }
-  }   // function to convert unix timestamp to relative time
+  } // function to convert unix timestamp to relative time
 
   chatIDGenerator(ID1, ID2) {
     if (ID1 < ID2) return `${ID1}_${ID2}`;
@@ -185,24 +185,32 @@ export default class Chatlist extends Component {
                   </h5>
                 </div>
               </Link>
-              {this.state.friendsList.map((friend, index) => {
-                return (
-                  <Link
-                    key={index}
-                    to={"/chat/" + friend.chatID}
-                    className="list-group-item list-group-item-action rounded-0"
-                  >
-                    <div className="d-flex w-100 justify-content-between">
-                      <h5 className="mb-0 font-weight-bold">{friend.uname}</h5>
-                      <small className="text-right">
-                        {this.timeSince(friend.lastMsgTimestamp)}
-                      </small>
-                    </div>
-                    <small className="mb-1">{friend.email}</small>
-                    <small className="text-muted">{friend.lastMsg}</small>
-                  </Link>
-                );
-              })}
+              {this.state.friendsList
+                .sort((a, b) => {
+                  // Filters to prevent any undefined/NaN/null values from getting sorted
+                  // and keep Falsy values at the end of the array
+                  if (!a.recentMsgTimestamp) a.recentMsgTimestamp = 0;
+                  if (!b.recentMsgTimestamp) b.recentMsgTimestamp = 0;
+                  return b.recentMsgTimestamp - a.recentMsgTimestamp;
+                }) // sort friends list according to recent message
+                .map((friend, index) => {
+                  return (
+                    <Link
+                      key={index}
+                      to={"/chat/" + friend.chatID}
+                      className="list-group-item list-group-item-action rounded-0"
+                    >
+                      <div className="d-flex w-100 justify-content-between">
+                        <h5 className="mb-0 font-weight-bold">{friend.uname}</h5>
+                        <small className="text-right">
+                          {this.timeSince(friend.recentMsgTimestamp)}
+                        </small>
+                      </div>
+                      <small className="mb-1">{friend.email}</small>
+                      <small className="text-muted">{friend.recentMsg}</small>
+                    </Link>
+                  );
+                })}
             </ul>
           </main>
         </div>
