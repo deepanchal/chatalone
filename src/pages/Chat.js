@@ -44,8 +44,8 @@ export default class Chat extends Component {
         });
         this.setState({ chats });
         this.setState({ loadingChats: false });
+        chatArea.scrollBy(0, chatArea.scrollHeight);
       });
-      chatArea.scrollBy(0, chatArea.scrollHeight);
     } catch (error) {
       this.setState({ readError: error.message, loadingChats: false });
     }
