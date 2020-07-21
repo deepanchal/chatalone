@@ -43,7 +43,6 @@ export function signInWithGoogle() {
   return auth()
     .signInWithPopup(provider)
     .then(function (result) {
-      console.log(result.additionalUserInfo.isNewUser);
       if (result.additionalUserInfo.isNewUser) addUserToDB();
     });
 }
