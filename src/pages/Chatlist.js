@@ -55,8 +55,8 @@ export default class Chatlist extends Component {
     if (this.state.inputVal) {
       try {
         const receiverID = await this.emailToID(this.state.inputVal);
-        if (!receiverID) throw { message: "No friend found with that email 😕" };
-        if (receiverID === senderID) throw { message: "You can't text yourself 💩" };
+        if (!receiverID) throw new Error("No friend found with that email 😕");
+        if (receiverID === senderID) throw new Error("You can't text yourself 💩");
         await this.makeFriends(senderID, receiverID);
         const chatID = this.chatIDGenerator(senderID, receiverID);
         this.props.history.push("/chat/" + chatID);

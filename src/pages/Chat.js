@@ -30,7 +30,7 @@ export default class Chat extends Component {
       const chatid = this.props.match.params.chatID;
       if (!chatid.split("_").includes(this.state.user.uid)) {
         this.props.history.push("/chat");
-        throw { message: "You shouldn't be here 🤨" };
+        throw new Error("You shouldn't be here 🤨");
       }
 
       await this.setFriendName();
@@ -66,7 +66,7 @@ export default class Chat extends Component {
         const chatid = this.props.match.params.chatID;
         if (!chatid.split("_").includes(this.state.user.uid)) {
           this.props.history.push("/chat");
-          throw { message: "You shouldn't be here 🤨" };
+          throw new Error("You shouldn't be here 🤨");
         }
         await db.ref(`chats/${chatid}`).push({
           content: this.state.content,

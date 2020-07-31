@@ -34,7 +34,7 @@ export default class SignUp extends Component {
     event.preventDefault();
     this.setState({ error: "" });
     try {
-      if (!this.state.name) throw { message: "Your name can't be blank" };
+      if (!this.state.name) throw new Error("Your name can't be blank");
       await signup(this.state.email, this.state.password);
       await updateDisplayName(this.state.name);
       await addUserToDB();
